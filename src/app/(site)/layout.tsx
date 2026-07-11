@@ -75,33 +75,34 @@ function TwitterIcon({ className }: { className?: string }) {
 }
 
 const studyAbroadDestinations = [
-  { name: "Study in Australia", href: "/destinations/australia" },
-  { name: "Study in USA", href: "/destinations/usa" },
-  { name: "Study in UK", href: "/destinations/uk" },
-  { name: "Study in Canada", href: "/destinations/canada" },
-  { name: "Study in New Zealand", href: "/destinations/new-zealand" },
+  { name: "Study in Australia", href: "/study-abroad/australia" },
+  { name: "Study in USA", href: "/study-abroad/usa" },
+  { name: "Study in UK", href: "/study-abroad/uk" },
+  { name: "Study in Canada", href: "/study-abroad/canada" },
+  { name: "Study in New Zealand", href: "/study-abroad/new-zealand" },
+  { name: "Study in Europe", href: "/study-abroad/europe" },
 ];
 
 const testPreparations = [
-  { name: "IELTS", href: "/test-prep/ielts" },
-  { name: "TOEFL", href: "/test-prep/toefl" },
-  { name: "PTE Academic", href: "/test-prep/pte" },
-  { name: "SAT", href: "/test-prep/sat" },
-  { name: "GRE / GMAT", href: "/test-prep/gre-gmat" },
+  { name: "IELTS", href: "/test-preparation/ielts" },
+  { name: "TOEFL", href: "/test-preparation/toefl" },
+  { name: "PTE Academic", href: "/test-preparation/pte" },
+  { name: "SAT", href: "/test-preparation/sat" },
+  { name: "GRE / GMAT", href: "/test-preparation/gre-gmat" },
 ];
 
 const serviceItems = [
-  { name: "Career Counselling", href: "/services/counselling" },
-  { name: "Visa Guidance & Documentation", href: "/services/visa-guidance" },
-  { name: "University Application Assistance", href: "/services/university-application" },
-  { name: "Scholarship & Financial Aid Support", href: "/services/scholarships" },
+  { name: "Career Counselling", href: "/services#career-counselling" },
+  { name: "Visa Guidance & Documentation", href: "/services#visa-guidance" },
+  { name: "University Application Assistance", href: "/services#uni-application" },
+  { name: "Scholarship & Financial Aid Support", href: "/services#scholarships" },
 ];
 
 const aboutUsItems = [
-  { name: "Our Profile & Mission", href: "/about" },
-  { name: "Meet the Team", href: "/about/team" },
-  { name: "Testimonials", href: "/about/testimonials" },
-  { name: "Partner With Us", href: "/about/partners" },
+  { name: "Our Profile & Mission", href: "/about-us" },
+  { name: "Meet the Team", href: "/about-us#team" },
+  { name: "Testimonials", href: "/reviews" },
+  { name: "Contact Branches", href: "/contact-us" },
 ];
 
 export default function SiteLayout({
@@ -266,7 +267,7 @@ export default function SiteLayout({
 
             {/* Contact */}
             <Link 
-              href="/contact" 
+              href="/contact-us" 
               className="px-3.5 py-1.5 rounded-lg hover:text-brand-primary hover:bg-slate-50 transition-colors"
             >
               Contact
@@ -280,7 +281,7 @@ export default function SiteLayout({
                 Studio Login
               </Button>
             </Link>
-            <Link href="/contact?counselling=free">
+            <Link href="/contact-us?counselling=free">
               <Button className="bg-brand-accent hover:bg-brand-accent/90 text-white font-bold px-5 shadow-md shadow-brand-accent/20 rounded-xl transition-all duration-200 hover:translate-y-[-1px]">
                 Book Free Counselling
               </Button>
@@ -422,7 +423,7 @@ export default function SiteLayout({
                       {/* Contact */}
                       <div>
                         <Link 
-                          href="/contact" 
+                          href="/contact-us" 
                           onClick={() => setMobileMenuOpen(false)}
                           className="block py-3 font-semibold text-base hover:text-brand-primary text-slate-900"
                         >
@@ -434,7 +435,7 @@ export default function SiteLayout({
 
                   {/* Drawer Footer CTA */}
                   <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-3">
-                    <Link href="/contact?counselling=free" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/contact-us?counselling=free" onClick={() => setMobileMenuOpen(false)}>
                       <Button className="w-full bg-brand-accent hover:bg-brand-accent/90 text-white font-bold rounded-xl py-6 shadow-md shadow-brand-accent/10">
                         Book Free Counselling
                       </Button>
@@ -489,9 +490,9 @@ export default function SiteLayout({
               <ul className="space-y-2.5 text-sm">
                 <li><Link href="/universities" className="hover:text-brand-accent transition-colors">Partner Universities</Link></li>
                 <li><Link href="/blog" className="hover:text-brand-accent transition-colors">Success Blogs & Articles</Link></li>
-                <li><Link href="/about" className="hover:text-brand-accent transition-colors">About Our Agency</Link></li>
-                <li><Link href="/about/team" className="hover:text-brand-accent transition-colors">Our Advisory Board</Link></li>
-                <li><Link href="/contact" className="hover:text-brand-accent transition-colors">Contact Offices</Link></li>
+                <li><Link href="/about-us" className="hover:text-brand-accent transition-colors">About Our Agency</Link></li>
+                <li><Link href="/about-us#team" className="hover:text-brand-accent transition-colors">Our Advisory Board</Link></li>
+                <li><Link href="/contact-us" className="hover:text-brand-accent transition-colors">Contact Offices</Link></li>
                 <li><Link href="/careers" className="hover:text-brand-accent transition-colors">Careers & Job Openings</Link></li>
               </ul>
             </div>
