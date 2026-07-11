@@ -52,6 +52,24 @@ interface BlogPostDetailPageProps {
   };
 }
 
+export async function generateMetadata({ params }: BlogPostDetailPageProps) {
+  const post = await getBlogPostBySlug(params.slug.toLowerCase());
+  if (!post) {
+    return {
+      title: "Blog Post | Downtown Consultancy",
+    };
+  }
+  return {
+    title: `${post.title} | Downtown Consultancy Blog`,
+    description: post.excerpt || `Read our article on ${post.title}. Stay updated with key advice for Nepalese international students.`,
+    openGraph: {
+      title: `${post.title} | Downtown Consultancy Blog`,
+      description: post.excerpt || `Latest educational updates and visa guidelines for international students.`,
+      images: [{ url: "/downtown.jpg" }],
+    }
+  };
+}
+
 export default async function BlogPostDetailPage({ params }: BlogPostDetailPageProps) {
   const postSlug = params.slug.toLowerCase();
 
@@ -61,12 +79,69 @@ export default async function BlogPostDetailPage({ params }: BlogPostDetailPageP
     notFound();
   }
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/blog`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": post.title,
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/blog/${post.slug}`
+      }
+    ]
+  };
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": post.title,
+    "description": post.excerpt,
+    "datePublished": post.date || new Date().toISOString(),
+    "author": {
+      "@type": "Person",
+      "name": post.author || "Downtown Editorial Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Downtown Consultancy",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/downtown.jpg`
+      }
+    },
+    "image": [
+      `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/downtown.jpg`
+    ]
+  };
+
   // Filter related posts (exclude current)
   const allBlogs = await getBlogPosts();
   const relatedPosts = allBlogs.filter(p => p.slug !== postSlug).slice(0, 2);
 
   return (
     <div>
+      {/* Dynamic JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
       {/* 1. ARTICLE HEADER BANNER */}
       <section className="bg-slate-50 border-b border-slate-100 py-12 md:py-16">
         <Container>

@@ -2,8 +2,9 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, Calendar, Clock, Filter, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import { Mail, Phone, Calendar, Clock, Filter, CheckCircle2, AlertCircle, RefreshCw, Send } from "lucide-react";
 import { updateInquiryStatus } from "@/lib/supabase/admin-actions";
+import { replyToInquiry } from "@/app/actions/inquiry";
 
 interface Inquiry {
   id: string;
@@ -15,6 +16,8 @@ interface Inquiry {
   destination_interest: string | null;
   status: "pending" | "processing" | "resolved";
   created_at: string;
+  replied_at?: string | null;
+  reply_message?: string | null;
 }
 
 interface InquiriesListClientProps {
@@ -26,6 +29,13 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
   const [isPending, startTransition] = useTransition();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // States for custom reply editor
+  const [replyingId, setReplyingId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replySendingId, setReplySendingId] = useState<string | null>(null);
+  const [replyError, setReplyError] = useState<string | null>(null);
+  const [replySuccessMessage, setReplySuccessMessage] = useState<string | null>(null);
 
   const filteredInquiries = initialInquiries.filter((inq) => {
     if (filterStatus === "all") return true;
@@ -44,6 +54,27 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
         setUpdatingId(null);
       }
     });
+  }
+
+  async function handleSendReply(id: string, recipientEmail: string) {
+    setReplyError(null);
+    setReplySuccessMessage(null);
+    setReplySendingId(id);
+
+    try {
+      const res = await replyToInquiry(id, recipientEmail, replyText);
+      if (res.success) {
+        setReplySuccessMessage("Email response sent successfully and logged in database.");
+        setReplyText("");
+        setReplyingId(null);
+        router.refresh();
+      }
+    } catch (err: any) {
+      console.error("Failed to send custom reply:", err);
+      setReplyError(err.message || "Failed to send email. Please try again.");
+    } finally {
+      setReplySendingId(null);
+    }
   }
 
   return (
@@ -156,6 +187,72 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
                 </div>
               </div>
 
+              {/* Display Past Reply History Logs if they exist */}
+              {inq.replied_at && (
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-1.5 mt-2">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    <span>
+                      Replied via email on {new Date(inq.replied_at).toLocaleDateString()} at{" "}
+                      {new Date(inq.replied_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}:
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 bg-white p-3 rounded border border-slate-100 whitespace-pre-line leading-relaxed font-sans shadow-sm">
+                    {inq.reply_message}
+                  </p>
+                </div>
+              )}
+
+              {/* Custom Reply Textarea Block */}
+              {replyingId === inq.id && (
+                <div className="border border-slate-200 rounded-xl bg-slate-50/50 p-4 space-y-3 mt-3 shadow-inner">
+                  <label className="block text-xs font-bold text-slate-650 uppercase">Compose Email Response</label>
+                  {replyError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700 font-semibold">
+                      {replyError}
+                    </div>
+                  )}
+                  <textarea
+                    rows={4}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Type custom email message to send directly to this student..."
+                    className="w-full bg-white border border-slate-200 text-xs rounded-lg p-3 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-y leading-normal text-slate-800"
+                    disabled={replySendingId === inq.id}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyingId(null);
+                        setReplyText("");
+                        setReplyError(null);
+                      }}
+                      className="h-8 px-3 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                      disabled={replySendingId === inq.id}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSendReply(inq.id, inq.email)}
+                      disabled={replySendingId === inq.id || !replyText.trim()}
+                      className="h-8 px-4 rounded-lg bg-brand-primary hover:bg-brand-primary/95 text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      {replySendingId === inq.id ? (
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Send className="w-3 h-3" />
+                      )}
+                      {replySendingId === inq.id ? "Sending..." : "Send Response"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Actions Footer */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
@@ -176,7 +273,7 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
                             : "bg-white border-slate-200 text-slate-650 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
-                        {updatingId === inq.id && inq.status !== status && "..." ? (
+                        {updatingId === inq.id && inq.status !== status ? (
                           <RefreshCw className="w-3 h-3 animate-spin inline mr-1" />
                         ) : null}
                         {status}
@@ -185,14 +282,21 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
                   </div>
                 </div>
 
-                {/* Reply Button (UI Placeholder) */}
-                <button
-                  type="button"
-                  className="h-8 px-4 rounded-lg bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary hover:text-brand-primary/90 text-xs font-bold border border-brand-primary/30 shadow-sm transition-colors flex items-center gap-1.5"
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  Reply via Email (Placeholder)
-                </button>
+                {/* Send Reply Button trigger */}
+                {replyingId !== inq.id && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReplyingId(inq.id);
+                      setReplyText("");
+                      setReplyError(null);
+                    }}
+                    className="h-8 px-4 rounded-lg bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary hover:text-brand-primary/90 text-xs font-bold border border-brand-primary/30 shadow-sm transition-colors flex items-center gap-1.5"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    {inq.replied_at ? "Write Another Reply" : "Reply via Email"}
+                  </button>
+                )}
               </div>
             </div>
           ))

@@ -27,6 +27,24 @@ interface UniversityDetailPageProps {
   };
 }
 
+export async function generateMetadata({ params }: UniversityDetailPageProps) {
+  const uni = await getUniversityBySlug(params.slug.toLowerCase());
+  if (!uni) {
+    return {
+      title: "University Details | Downtown Consultancy",
+    };
+  }
+  return {
+    title: `${uni.name} | Study in ${uni.city}, ${uni.country}`,
+    description: uni.aboutText ? uni.aboutText.substring(0, 160) : `Learn more about ${uni.name} in ${uni.city}, ${uni.country}. Check courses offered, admission requirements, and scholarship pathways.`,
+    openGraph: {
+      title: `${uni.name} | Study in ${uni.city}, ${uni.country}`,
+      description: uni.aboutText ? uni.aboutText.substring(0, 160) : `Learn more about courses, requirements, and information to study at ${uni.name}.`,
+      images: uni.logo ? [{ url: uni.logo }] : [{ url: "/downtown.jpg" }],
+    }
+  };
+}
+
 export default async function UniversityDetailPage({ params }: UniversityDetailPageProps) {
   const uniSlug = params.slug.toLowerCase();
   
@@ -36,8 +54,38 @@ export default async function UniversityDetailPage({ params }: UniversityDetailP
     notFound();
   }
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Universities",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/universities`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": university.name,
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/universities/${university.slug}`
+      }
+    ]
+  };
+
   return (
     <div>
+      {/* Dynamic JSON-LD breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* 1. HERO BANNER */}
       <section className="relative bg-brand-primary text-white py-16 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950/40 z-10" />

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
 
@@ -69,10 +70,13 @@ export function MediaUploader({
     <div className="space-y-2 text-slate-800">
       {value ? (
         <div className="relative group">
-          <img
+          <Image
             src={value}
             alt="Uploaded"
+            width={400}
+            height={160}
             className="w-full h-40 object-cover rounded-lg border border-slate-200"
+            unoptimized
           />
           <button
             type="button"
@@ -152,10 +156,13 @@ export function MultiMediaUploader({
       <div className="grid grid-cols-3 gap-2">
         {value.map((url, i) => (
           <div key={i} className="relative group">
-            <img
+            <Image
               src={url}
               alt={`Gallery ${i + 1}`}
+              width={200}
+              height={80}
               className="w-full h-20 object-cover rounded-md border border-slate-200"
+              unoptimized
             />
             <button
               type="button"

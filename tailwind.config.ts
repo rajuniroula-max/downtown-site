@@ -40,8 +40,8 @@ const config: Config = {
             foreground: "#ffffff",
           },
           accent: {
-            DEFAULT: "#F97316",
-            hover: "#ea580c",
+            DEFAULT: "#EA580C", // Orange-600: meets 4.5:1 WCAG AA contrast standard with white text
+            hover: "#C2410C",   // Orange-700
             foreground: "#ffffff",
           },
         },

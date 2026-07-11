@@ -12,6 +12,11 @@ import { Button } from "@/components/ui/button";
 import { getTestimonials } from "@/lib/supabase/queries";
 import ReviewsFormClient from "@/components/site/reviews-form-client";
 
+export const metadata = {
+  title: "Student Success Stories & Reviews | Downtown Consultancy",
+  description: "Read verified student testimonials, success stories, and visa approval reviews from students placed by Downtown Consultancy across Australia, UK, USA, Canada, and Europe.",
+};
+
 export default async function TestimonialReviewsPage() {
   const testimonials = await getTestimonials();
 

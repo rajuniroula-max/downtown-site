@@ -35,6 +35,24 @@ interface TestPrepPageProps {
   };
 }
 
+export async function generateMetadata({ params }: TestPrepPageProps) {
+  const prep = await getTestPrepBySlug(params.test.toLowerCase());
+  if (!prep) {
+    return {
+      title: "Test Preparation | Downtown Consultancy",
+    };
+  }
+  return {
+    title: `${prep.name.toUpperCase()} Preparation Classes Kathmandu | Downtown`,
+    description: prep.tagline || `Enroll in our top-rated ${prep.name} preparation classes in Kathmandu, Nepal. Complete syllabus coverage, certified tutors, flexible timing, and free study materials.`,
+    openGraph: {
+      title: `${prep.name.toUpperCase()} Preparation Classes Kathmandu | Downtown`,
+      description: prep.tagline || `Certified test preparation courses for ${prep.name} with flexible schedules and mock exams.`,
+      images: [{ url: "/downtown.jpg" }],
+    }
+  };
+}
+
 export default async function TestPrepDetailPage({ params }: TestPrepPageProps) {
   const testSlug = params.test.toLowerCase();
   
@@ -44,8 +62,38 @@ export default async function TestPrepDetailPage({ params }: TestPrepPageProps) 
     notFound();
   }
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Test Preparation",
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/#test-prep`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": program.name,
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/test-preparation/${program.slug}`
+      }
+    ]
+  };
+
   return (
     <div>
+      {/* Dynamic JSON-LD breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* 1. HERO BANNER */}
       <section className="relative bg-brand-primary text-white py-20 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950/40 z-10" />

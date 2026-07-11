@@ -35,6 +35,7 @@ export async function upsertDestination(id: string | null, data: any) {
     popular_courses: data.popularCourses || [],
     published: data.published ?? true,
     order_index: data.orderIndex ?? 0,
+    hero_image_alt: data.heroImageAlt || "Destination Skyline",
   };
 
   if (id) {
@@ -63,6 +64,8 @@ export async function upsertUniversity(id: string | null, data: any) {
     gallery_images: data.galleryImages || [],
     is_featured: data.isFeatured ?? false,
     published: data.published ?? true,
+    logo_alt: data.logoAlt || "University Logo",
+    gallery_images_alts: data.galleryImagesAlts || [],
   };
 
   if (id) {
@@ -137,6 +140,7 @@ export async function upsertTeamMember(id: string | null, data: any) {
     image: data.image,
     order_index: data.orderIndex ?? 0,
     published: data.published ?? true,
+    image_alt: data.imageAlt || "Team Member Photo",
   };
 
   if (id) {

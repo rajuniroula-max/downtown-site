@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Script from "next/script";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { 
@@ -116,6 +118,24 @@ export default function SiteLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased selection:bg-brand-accent/20 selection:text-brand-primary">
+      {/* Google Analytics 4 (Conditional) */}
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+            `}
+          </Script>
+        </>
+      )}
+
       {/* Announcement Bar */}
       {showAnnounce && (
         <div className="bg-brand-primary text-white py-2 px-4 relative z-50 text-center text-xs sm:text-sm font-medium border-b border-blue-900/30 flex items-center justify-center">
@@ -146,9 +166,14 @@ export default function SiteLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center text-white shadow-md shadow-brand-primary/20 transition-transform group-hover:scale-105">
-              <GraduationCap className="w-6 h-6 text-brand-accent" />
-            </div>
+            <Image 
+              src="/downtown.jpg" 
+              alt="Downtown Consultancy" 
+              width={40} 
+              height={40} 
+              className="w-10 h-10 object-contain rounded-xl shadow-md border border-slate-100 transition-transform group-hover:scale-105" 
+              priority
+            />
             <div className="flex flex-col">
               <span className="font-extrabold text-xl tracking-tight text-brand-primary leading-tight">
                 DOWNTOWN

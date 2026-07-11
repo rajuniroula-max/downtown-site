@@ -20,14 +20,44 @@ import {
   Calendar,
   User
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { cn } from "@/lib/utils";
+
+const LeadFormClient = dynamic(
+  () => import("@/components/site/lead-form-client").then((mod) => mod.LeadFormClient),
+  { 
+    ssr: true,
+    loading: () => (
+      <div className="h-64 bg-slate-50 border border-slate-100 rounded-3xl animate-pulse text-center py-20">
+        <span className="text-slate-400 text-xs font-semibold">Loading free counselling form...</span>
+      </div>
+    )
+  }
+);
 import { 
   getDestinations, 
   getServices, 
   getTestimonials, 
-  getBlogPosts 
+  getBlogPosts,
+  getBranches
 } from "@/lib/supabase/queries";
+
+export const metadata = {
+  title: "Downtown Consultancy | Best Study Abroad Agency in Nepal",
+  description: "DOWNTOWN Educational Consultancy is the leading study abroad agency in Kathmandu, Nepal. Get expert counselling for Australia, USA, UK, Canada, and New Zealand. Boost your test preparation with our IELTS and PTE classes.",
+  openGraph: {
+    title: "Downtown Consultancy | Best Study Abroad Agency in Nepal",
+    description: "DOWNTOWN Educational Consultancy is the leading study abroad agency in Kathmandu, Nepal. Expert counselling for Australia, USA, UK, Canada, New Zealand.",
+    images: [{ url: "/downtown.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Downtown Consultancy | Best Study Abroad Agency in Nepal",
+    description: "Get expert counselling for Australia, USA, UK, Canada, and New Zealand in Nepal.",
+    images: ["/downtown.jpg"],
+  }
+};
 
 // Map string icon names to Lucide icons
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -59,6 +89,7 @@ export default async function Home() {
   const rawServices = await getServices();
   const studentTestimonials = await getTestimonials();
   const recentBlogs = (await getBlogPosts()).slice(0, 3);
+  const branches = await getBranches();
 
   // Map service styles
   const consultancyServices = rawServices.map((srv, idx) => ({
@@ -69,8 +100,47 @@ export default async function Home() {
       : "bg-orange-50 text-brand-accent border-orange-100"
   }));
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  
+  const orgSchema = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Downtown Educational Consultancy",
+    "url": siteUrl,
+    "logo": `${siteUrl}/downtown.jpg`,
+    "description": "Leading study abroad consultancy in Kathmandu, Nepal. Authorized QEAC counselors assisting students in admission and visa documentation for Australia, USA, UK, Canada, and New Zealand.",
+    "sameAs": [
+      "https://facebook.com/downtowneducancy",
+      "https://instagram.com/downtowneducancy"
+    ]
+  };
+
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Downtown Educational Consultancy",
+    "image": `${siteUrl}/downtown.jpg`,
+    "url": siteUrl,
+    "telephone": "+977-1-4412345",
+    "address": branches.map((b) => ({
+      "@type": "PostalAddress",
+      "streetAddress": b.address,
+      "addressLocality": b.name,
+      "addressCountry": "NP"
+    }))
+  };
+
   return (
     <div className="bg-slate-50/50">
+      {/* Dynamic structured SEO schemas */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       {/* 1. HERO SECTION */}
       <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50/30 pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden border-b border-slate-100">
         <div className="absolute top-1/4 left-1/10 w-96 h-96 rounded-full bg-blue-100/40 blur-3xl pointer-events-none" />
@@ -436,78 +506,7 @@ export default async function Home() {
           </div>
 
           {/* Lead Intake Form */}
-          <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 md:p-8 shadow-xl text-left max-w-3xl mx-auto">
-            <span className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
-              Free Counselling Form
-            </span>
-            <form className="space-y-6" action="/contact-us">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Full Name */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Full Name</label>
-                  <input 
-                    type="text" 
-                    name="name"
-                    placeholder="Enter your name" 
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10"
-                    required
-                  />
-                </div>
-
-                {/* Email Address */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Email Address</label>
-                  <input 
-                    type="email" 
-                    name="email"
-                    placeholder="Enter your email" 
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10"
-                    required
-                  />
-                </div>
-
-                {/* Phone Number */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Phone Number</label>
-                  <input 
-                    type="tel" 
-                    name="phone"
-                    placeholder="Enter your contact number" 
-                    className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10"
-                    required
-                  />
-                </div>
-
-                {/* Target Destination */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Target Destination</label>
-                  <select 
-                    name="destination"
-                    className="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-brand-primary"
-                    required
-                  >
-                    <option value="">Select Target Country...</option>
-                    <option value="australia">Australia</option>
-                    <option value="uk">United Kingdom</option>
-                    <option value="usa">United States</option>
-                    <option value="canada">Canada</option>
-                    <option value="new-zealand">New Zealand</option>
-                    <option value="europe">Europe</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-2 text-center">
-                <Button type="submit" className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-white text-base font-bold py-4 px-10 rounded-xl shadow-lg shadow-brand-accent/20 transition-all">
-                  Request Call Back
-                </Button>
-                <span className="block text-[11px] text-slate-400 mt-3 text-center">
-                  * By clicking submit, you agree to our privacy policy guidelines. No spam, guaranteed.
-                </span>
-              </div>
-            </form>
-          </div>
+          <LeadFormClient />
         </Container>
       </section>
     </div>

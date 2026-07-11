@@ -13,6 +13,7 @@ export function TeamForm({ initialData, id }: Props) {
     name: initialData?.name || "", role: initialData?.role || "",
     bio: initialData?.bio || "", image: initialData?.image || "",
     orderIndex: initialData?.order_index ?? 0, published: initialData?.published ?? true,
+    imageAlt: initialData?.image_alt || "Team Member Photo",
   });
   function u(k: string, v: any) { setForm((p) => ({ ...p, [k]: v })); }
   async function handleSubmit(e: React.FormEvent) {
@@ -31,8 +32,20 @@ export function TeamForm({ initialData, id }: Props) {
           <F label="Role *" value={form.role} onChange={(v) => u("role", v)} placeholder="e.g. Senior Counsellor" />
           <F label="Order" value={String(form.orderIndex)} onChange={(v) => u("orderIndex", parseInt(v)||0)} type="number" />
         </div>
-        <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Photo</label>
-          <MediaUploader value={form.image} onChange={(v) => u("image", v)} folder="team" label="Upload photo" /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Photo</label>
+            <MediaUploader value={form.image} onChange={(v) => u("image", v)} folder="team" label="Upload photo" />
+          </div>
+          <div>
+            <F 
+              label="Photo Alt Text *" 
+              value={form.imageAlt} 
+              onChange={(v) => u("imageAlt", v)} 
+              placeholder="e.g. Portrait of Anjana Sharma smiling" 
+            />
+          </div>
+        </div>
         <div><label className="block text-xs font-semibold text-slate-700 mb-1.5">Bio</label>
           <textarea value={form.bio} onChange={(e) => u("bio", e.target.value)} rows={4} className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors resize-y leading-normal" /></div>
         <label className="flex items-center gap-2 cursor-pointer">

@@ -9,6 +9,11 @@ import {
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { getTeamMembers, getBranches } from "@/lib/supabase/queries";
 
+export const metadata = {
+  title: "About Us | Downtown Consultancy",
+  description: "Learn about Downtown Consultancy's mission, our certified country counselors, and our branch network. We are dedicated to providing ethical, student-first study abroad advising.",
+};
+
 const companyMilestones = [
   { year: "2014", title: "Downtown Founded", desc: "Started operations in Kathmandu with 3 counselors focusing on USA/Australia admissions." },
   { year: "2017", title: "QEAC Admittance", desc: "Obtained official Qualified Education Agent Counsellor credentials for Australia admissions." },

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -81,9 +82,14 @@ export function StudioSidebar({ userEmail, userName }: StudioSidebarProps) {
     <aside className="w-60 border-r border-slate-100 bg-white flex flex-col shrink-0 h-screen sticky top-0 font-sans shadow-sm">
       {/* Brand */}
       <div className="h-16 px-6 border-b border-slate-100 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-primary to-indigo-600 flex items-center justify-center shadow-md shadow-brand-primary/10">
-          <GraduationCap className="w-4 h-4 text-white" />
-        </div>
+        <Image 
+          src="/downtown.jpg" 
+          alt="Downtown Consultancy" 
+          width={32} 
+          height={32} 
+          className="w-8 h-8 object-contain rounded-lg shadow-sm border border-slate-100" 
+          priority
+        />
         <span className="font-extrabold text-sm tracking-tight text-slate-900">Downtown Studio</span>
       </div>
 

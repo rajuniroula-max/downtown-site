@@ -28,6 +28,8 @@ export function UniversityForm({ initialData, id }: Props) {
     galleryImages: initialData?.gallery_images || [],
     isFeatured: initialData?.is_featured ?? false,
     published: initialData?.published ?? true,
+    logoAlt: initialData?.logo_alt || "University Logo",
+    galleryImagesAlts: initialData?.gallery_images_alts || [],
   });
 
   function update(key: string, value: any) {
@@ -38,8 +40,15 @@ export function UniversityForm({ initialData, id }: Props) {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    // Align gallery image alts array length to match gallery images
+    const alignedAlts = form.galleryImages.map((_: any, idx: number) => {
+      return form.galleryImagesAlts[idx] || "University Campus Gallery Image";
+    });
     try {
-      await upsertUniversity(isEdit ? id : null, form);
+      await upsertUniversity(isEdit ? id : null, {
+        ...form,
+        galleryImagesAlts: alignedAlts
+      });
       router.push("/studio/universities");
       router.refresh();
     } catch (err: any) { setError(err.message); } finally { setLoading(false); }
@@ -61,9 +70,19 @@ export function UniversityForm({ initialData, id }: Props) {
           <Field label="City *" value={form.city} onChange={(v) => update("city", v)} />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1.5">Logo</label>
-          <MediaUploader value={form.logo} onChange={(v) => update("logo", v)} folder="universities" label="Upload university logo" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Logo</label>
+            <MediaUploader value={form.logo} onChange={(v) => update("logo", v)} folder="universities" label="Upload university logo" />
+          </div>
+          <div>
+            <Field 
+              label="Logo Alt Text *" 
+              value={form.logoAlt} 
+              onChange={(v) => update("logoAlt", v)} 
+              placeholder="e.g. University Crest Logo" 
+            />
+          </div>
         </div>
 
         <div>

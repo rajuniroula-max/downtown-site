@@ -34,6 +34,7 @@ export function DestinationForm({ initialData, id }: DestinationFormProps) {
     popularCourses: initialData?.popular_courses || [],
     published: initialData?.published ?? true,
     orderIndex: initialData?.order_index ?? 0,
+    heroImageAlt: initialData?.hero_image_alt || "Destination Skyline",
   });
 
   function update(key: string, value: any) {
@@ -83,9 +84,19 @@ export function DestinationForm({ initialData, id }: DestinationFormProps) {
         </div>
 
         {/* Hero Image */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1.5">Hero Image</label>
-          <MediaUploader value={form.heroImage} onChange={(v) => update("heroImage", v)} folder="destinations" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Hero Image</label>
+            <MediaUploader value={form.heroImage} onChange={(v) => update("heroImage", v)} folder="destinations" />
+          </div>
+          <div>
+            <Field 
+              label="Hero Image Alt Text *" 
+              value={form.heroImageAlt} 
+              onChange={(v) => update("heroImageAlt", v)} 
+              placeholder="e.g. Skyline of Sydney harbor" 
+            />
+          </div>
         </div>
 
         {/* Why Study Text */}

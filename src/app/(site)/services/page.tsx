@@ -14,6 +14,11 @@ import { Container, Section, SectionHeading } from "@/components/site/layout-com
 import { Button } from "@/components/ui/button";
 import { getServices } from "@/lib/supabase/queries";
 
+export const metadata = {
+  title: "Our Services | Study Abroad Consulting Kathmandu",
+  description: "Explore our study abroad support services, including career counseling, university selection, visa documentation assistance, scholarship guidance, and pre-departure briefings.",
+};
+
 // Map string icon names to Lucide icons
 const iconMap: Record<string, React.ComponentType<any>> = {
   GraduationCap: GraduationCap,
