@@ -6,10 +6,8 @@ import {
   CheckCircle2, 
   Wallet, 
   GraduationCap, 
-  FileText,
-  Calendar,
-  User,
-  ArrowLeft
+  ArrowLeft,
+  User
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { Button } from "@/components/ui/button";
@@ -19,7 +17,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { mockDestinations, mockUniversities, mockBlogPosts } from "@/lib/types/mock-data";
+import { 
+  getDestinationBySlug, 
+  getUniversities, 
+  getBlogPosts 
+} from "@/lib/supabase/queries";
 
 // generateStaticParams stub covering Australia, UK, USA, Canada, New Zealand, Europe
 export function generateStaticParams() {
@@ -39,24 +41,26 @@ interface DestinationPageProps {
   };
 }
 
-export default function StudyAbroadCountryPage({ params }: DestinationPageProps) {
+export default async function StudyAbroadCountryPage({ params }: DestinationPageProps) {
   const countrySlug = params.country.toLowerCase();
   
   // Find destination details
-  const destination = mockDestinations.find(d => d.slug === countrySlug);
+  const destination = await getDestinationBySlug(countrySlug);
   if (!destination) {
     notFound();
   }
 
   // Filter top partner universities in this country
+  const allUniversities = await getUniversities();
   const countryNameLower = destination.country.toLowerCase();
-  const countryUniversities = mockUniversities.filter(uni => 
+  const countryUniversities = allUniversities.filter(uni => 
     uni.country.toLowerCase() === countryNameLower || 
     (countrySlug === "europe" && ["europe", "germany", "france"].includes(uni.country.toLowerCase()))
   );
 
   // Filter related blog posts
-  const relatedBlogs = mockBlogPosts.filter(post => 
+  const allBlogs = await getBlogPosts();
+  const relatedBlogs = allBlogs.filter(post => 
     post.title.toLowerCase().includes(countrySlug) ||
     post.excerpt.toLowerCase().includes(countrySlug)
   );
@@ -66,7 +70,6 @@ export default function StudyAbroadCountryPage({ params }: DestinationPageProps)
       {/* 1. HERO BANNER */}
       <section className="relative bg-brand-primary text-white py-20 overflow-hidden">
         <div className="absolute inset-0 bg-slate-950/40 z-10" />
-        {/* Decorative elements */}
         <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-brand-accent/20 blur-3xl z-0" />
         <div className="absolute left-1/10 bottom-1/10 w-96 h-96 rounded-full bg-blue-900/40 blur-3xl z-0" />
 
@@ -84,7 +87,7 @@ export default function StudyAbroadCountryPage({ params }: DestinationPageProps)
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
               Study in {destination.country} {destination.flagIcon}
             </h1>
-            <p className="text-blue-100 text-lg sm:text-xl leading-relaxed max-w-2xl">
+            <p className="text-blue-100 text-lg sm:text-xl leading-relaxed max-w-2xl" style={{ textWrap: "balance" }}>
               {destination.tagline}
             </p>
           </div>
@@ -102,7 +105,7 @@ export default function StudyAbroadCountryPage({ params }: DestinationPageProps)
               <h2 className="text-3xl font-extrabold text-slate-900">
                 Global Recognition & Outstanding Learning Experience
               </h2>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
                 {destination.whyStudyText}
               </p>
               
@@ -296,7 +299,7 @@ export default function StudyAbroadCountryPage({ params }: DestinationPageProps)
                     </p>
                   </div>
                   <div className="mt-5 pt-3 border-t border-slate-50 flex items-center justify-between text-[11px] text-slate-400">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <User className="w-3 h-3" />
                       <span>{blog.author}</span>
                     </div>
@@ -321,7 +324,7 @@ export default function StudyAbroadCountryPage({ params }: DestinationPageProps)
           </p>
           <div className="flex justify-center pt-2">
             <Link href="/contact-us?counselling=free">
-              <Button className="bg-brand-accent hover:bg-brand-accent/90 text-white text-base font-bold py-6 px-10 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center gap-2">
+              <Button className="bg-brand-accent hover:bg-brand-accent-hover text-white text-base font-bold py-6 px-10 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center gap-2">
                 Book Free Consultation <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>

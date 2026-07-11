@@ -12,13 +12,13 @@ import {
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { Button } from "@/components/ui/button";
-import { mockUniversities } from "@/lib/types/mock-data";
+import { getUniversityBySlug } from "@/lib/supabase/queries";
 
-// generateStaticParams stub covering the mock universities slugs
+// generateStaticParams stub covering mock universities from local helper
 export function generateStaticParams() {
-  return mockUniversities.map(uni => ({
-    slug: uni.slug
-  }));
+  return [
+    { slug: "anu-australia" }
+  ];
 }
 
 interface UniversityDetailPageProps {
@@ -27,11 +27,11 @@ interface UniversityDetailPageProps {
   };
 }
 
-export default function UniversityDetailPage({ params }: UniversityDetailPageProps) {
+export default async function UniversityDetailPage({ params }: UniversityDetailPageProps) {
   const uniSlug = params.slug.toLowerCase();
   
   // Find university details
-  const university = mockUniversities.find(u => u.slug === uniSlug);
+  const university = await getUniversityBySlug(uniSlug);
   if (!university) {
     notFound();
   }
@@ -77,7 +77,7 @@ export default function UniversityDetailPage({ params }: UniversityDetailPagePro
             <div className="lg:col-span-8 space-y-8">
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-slate-900">About the Institution</h2>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
                   {university.aboutText}
                 </p>
               </div>
@@ -134,19 +134,21 @@ export default function UniversityDetailPage({ params }: UniversityDetailPagePro
               </div>
 
               {/* Campus Gallery */}
-              <div className="space-y-3">
-                <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Campus Gallery</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {university.galleryImages.map((img, idx) => (
-                    <div 
-                      key={idx}
-                      className="h-28 bg-slate-100 rounded-xl border border-slate-200/50 flex items-center justify-center text-slate-400 font-bold text-xs"
-                    >
-                      Campus Preview
-                    </div>
-                  ))}
+              {university.galleryImages && university.galleryImages.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wide">Campus Gallery</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {university.galleryImages.map((img, idx) => (
+                      <div 
+                        key={idx}
+                        className="h-28 bg-slate-100 rounded-xl border border-slate-200/50 flex items-center justify-center text-slate-400 font-bold text-xs"
+                      >
+                        Campus Preview
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </Container>

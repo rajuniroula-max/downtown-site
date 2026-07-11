@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { Button } from "@/components/ui/button";
-import { mockBlogPosts } from "@/lib/types/mock-data";
+import { getBlogPostBySlug, getBlogPosts } from "@/lib/supabase/queries";
 
 // Custom Social Sharing SVGs
 function FacebookIcon({ className }: { className?: string }) {
@@ -39,11 +39,11 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-// generateStaticParams stub covering the mock blog slugs
+// generateStaticParams stub covering mock blog slugs
 export function generateStaticParams() {
-  return mockBlogPosts.map(post => ({
-    slug: post.slug
-  }));
+  return [
+    { slug: "australia-visa-guide" }
+  ];
 }
 
 interface BlogPostDetailPageProps {
@@ -52,17 +52,18 @@ interface BlogPostDetailPageProps {
   };
 }
 
-export default function BlogPostDetailPage({ params }: BlogPostDetailPageProps) {
+export default async function BlogPostDetailPage({ params }: BlogPostDetailPageProps) {
   const postSlug = params.slug.toLowerCase();
 
   // Find blog post details
-  const post = mockBlogPosts.find(p => p.slug === postSlug);
+  const post = await getBlogPostBySlug(postSlug);
   if (!post) {
     notFound();
   }
 
   // Filter related posts (exclude current)
-  const relatedPosts = mockBlogPosts.filter(p => p.slug !== postSlug).slice(0, 2);
+  const allBlogs = await getBlogPosts();
+  const relatedPosts = allBlogs.filter(p => p.slug !== postSlug).slice(0, 2);
 
   return (
     <div>

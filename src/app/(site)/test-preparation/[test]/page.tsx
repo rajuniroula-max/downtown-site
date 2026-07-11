@@ -6,9 +6,7 @@ import {
   CheckCircle2, 
   Clock, 
   GraduationCap, 
-  ArrowLeft,
-  Calendar,
-  BookOpen
+  ArrowLeft
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { Button } from "@/components/ui/button";
@@ -18,7 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { mockTestPrep } from "@/lib/types/mock-data";
+import { getTestPrepBySlug } from "@/lib/supabase/queries";
 
 // generateStaticParams stub covering IELTS, TOEFL, PTE, SAT, GRE-GMAT
 export function generateStaticParams() {
@@ -37,11 +35,11 @@ interface TestPrepPageProps {
   };
 }
 
-export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
+export default async function TestPrepDetailPage({ params }: TestPrepPageProps) {
   const testSlug = params.test.toLowerCase();
   
   // Find test prep program details
-  const program = mockTestPrep.find(p => p.slug === testSlug);
+  const program = await getTestPrepBySlug(testSlug);
   if (!program) {
     notFound();
   }
@@ -68,7 +66,7 @@ export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
               {program.name} Preparation
             </h1>
-            <p className="text-blue-100 text-lg sm:text-xl leading-relaxed max-w-2xl">
+            <p className="text-blue-100 text-lg sm:text-xl leading-relaxed max-w-2xl" style={{ textWrap: "balance" }}>
               {program.tagline}
             </p>
           </div>
@@ -87,7 +85,7 @@ export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
               <h2 className="text-3xl font-extrabold text-slate-900">
                 About the {program.name} Examination
               </h2>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
                 {program.overview}
               </p>
               
@@ -106,11 +104,9 @@ export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
 
             {/* Sidebar Details */}
             <div className="lg:col-span-5 bg-blue-50/50 rounded-3xl p-8 border border-blue-100/50 space-y-6">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <h3 className="font-bold text-brand-primary text-lg">Course Logistics</h3>
-                <p className="text-slate-500 text-xs uppercase font-bold tracking-wider">
-                  TODO: Manage schedules via Studio dashboard
-                </p>
+                <span className="block text-slate-400 text-xs font-bold uppercase tracking-wide">Validated Admissions Hub</span>
               </div>
 
               <ul className="space-y-4 border-t border-b border-blue-100/50 py-5">
@@ -130,7 +126,7 @@ export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
 
               <div className="pt-2">
                 <Link href="#enroll">
-                  <Button className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white font-bold py-6 rounded-xl shadow-md shadow-brand-accent/10">
+                  <Button className="w-full bg-brand-accent hover:bg-brand-accent/90 text-white font-bold py-6 rounded-xl shadow-md shadow-brand-accent/10">
                     Enroll in Class Now
                   </Button>
                 </Link>
@@ -218,7 +214,6 @@ export default function TestPrepDetailPage({ params }: TestPrepPageProps) {
             Book a free 2-day trial class before enrolling. Take a diagnostic mock test and evaluate your current scores under the guidance of our experts.
           </p>
           
-          {/* Simple Enrollment Trigger */}
           <div className="flex justify-center pt-2">
             <Link href="/contact-us?counselling=class">
               <Button className="bg-brand-accent hover:bg-brand-accent-hover text-white text-base font-bold py-6 px-10 rounded-xl shadow-lg shadow-brand-accent/25 flex items-center gap-2">

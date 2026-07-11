@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { 
@@ -14,7 +12,7 @@ import {
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { Button } from "@/components/ui/button";
-import { mockServices } from "@/lib/types/mock-data";
+import { getServices } from "@/lib/supabase/queries";
 
 // Map string icon names to Lucide icons
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -26,7 +24,9 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   HeartHandshake: HeartHandshake
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServices();
+
   return (
     <div>
       {/* 1. HERO BANNER */}
@@ -58,7 +58,7 @@ export default function ServicesPage() {
           />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockServices.map((srv) => {
+            {services.map((srv) => {
               const IconComponent = iconMap[srv.iconName] || GraduationCap;
               return (
                 <a 
@@ -85,7 +85,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* 3. DETAILED ANCHOR SECTIONS */}
-      {mockServices.map((srv, idx) => {
+      {services.map((srv, idx) => {
         const IconComponent = iconMap[srv.iconName] || GraduationCap;
         const isMutedBg = idx % 2 === 1;
         return (

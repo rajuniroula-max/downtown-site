@@ -1,17 +1,13 @@
-"use client";
-
 import React from "react";
 import { 
-  CheckCircle2, 
   MapPin, 
   Phone, 
   Mail, 
-  Sparkles,
   Building,
   GraduationCap
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
-import { mockTeamMembers, mockBranches } from "@/lib/types/mock-data";
+import { getTeamMembers, getBranches } from "@/lib/supabase/queries";
 
 const companyMilestones = [
   { year: "2014", title: "Downtown Founded", desc: "Started operations in Kathmandu with 3 counselors focusing on USA/Australia admissions." },
@@ -20,7 +16,10 @@ const companyMilestones = [
   { year: "2024", title: "5000+ Enrolled Students", desc: "Successfully milestone reached of placing international students across global university campuses." }
 ];
 
-export default function AboutUsPage() {
+export default async function AboutUsPage() {
+  const teamMembers = await getTeamMembers();
+  const branches = await getBranches();
+
   return (
     <div>
       {/* 1. HERO BANNER */}
@@ -103,98 +102,99 @@ export default function AboutUsPage() {
       </Section>
 
       {/* 4. TEAM GRID */}
-      <Section id="team" bg="default">
-        <Container>
-          <SectionHeading 
-            badge="Downtown Directors"
-            title="Meet Our Board of Advisors"
-            description="Our counseling team consists of qualified directors with extensive international study experience."
-          />
+      {teamMembers.length > 0 && (
+        <Section id="team" bg="default">
+          <Container>
+            <SectionHeading 
+              badge="Downtown Directors"
+              title="Meet Our Board of Advisors"
+              description="Our counseling team consists of qualified directors with extensive international study experience."
+            />
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {mockTeamMembers.map((member) => (
-              <div 
-                key={member.id}
-                className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm p-6 text-center space-y-4 hover:shadow-md transition-shadow"
-              >
-                <div className="w-16 h-16 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center font-black text-lg mx-auto border border-blue-100">
-                  {member.image}
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {teamMembers.map((member) => (
+                <div 
+                  key={member.id}
+                  className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm p-6 text-center space-y-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="w-16 h-16 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center font-black text-lg mx-auto border border-blue-100">
+                    {member.image}
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-slate-900 text-base">{member.name}</h4>
+                    <span className="block text-brand-accent text-xs font-bold uppercase tracking-wider">{member.role}</span>
+                  </div>
+                  <p className="text-slate-500 text-xs leading-relaxed max-w-xs mx-auto">
+                    {member.bio}
+                  </p>
                 </div>
-                <div className="space-y-1">
-                  <h4 className="font-bold text-slate-900 text-base">{member.name}</h4>
-                  <span className="block text-brand-accent text-xs font-bold uppercase tracking-wider">{member.role}</span>
-                </div>
-                <p className="text-slate-500 text-xs leading-relaxed max-w-xs mx-auto">
-                  {member.bio}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
 
       {/* 5. BRANCH OFFICES LOCATOR */}
-      <Section bg="muted" className="border-t border-slate-100">
-        <Container>
-          <SectionHeading 
-            badge="Locations Locator"
-            title="Our Branch Offices"
-            description="Visit our offices physically for a consultation. Directions and maps are details below."
-          />
+      {branches.length > 0 && (
+        <Section bg="muted" className="border-t border-slate-100">
+          <Container>
+            <SectionHeading 
+              badge="Locations Locator"
+              title="Our Branch Offices"
+              description="Visit our offices physically for a consultation. Directions and maps are details below."
+            />
 
-          <div className="space-y-16 max-w-5xl mx-auto">
-            {mockBranches.map((branch, idx) => {
-              const isEven = idx % 2 === 1;
-              return (
-                <div 
-                  key={branch.id}
-                  className={`grid lg:grid-cols-12 gap-8 items-center bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm ${
-                    isEven ? "lg:flex-row-reverse" : ""
-                  }`}
-                >
-                  {/* Branch details */}
-                  <div className="lg:col-span-5 space-y-5 text-left">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-blue-50 text-brand-primary border border-blue-100">
-                      Office Branch
-                    </span>
-                    <h3 className="text-xl font-bold text-slate-900">{branch.name}</h3>
-                    
-                    <ul className="space-y-3.5 text-sm text-slate-500">
-                      <li className="flex items-start gap-2.5">
-                        <MapPin className="w-5 h-5 text-brand-accent flex-shrink-0 mt-0.5" />
-                        <span>{branch.address}</span>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Phone className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                        <a href={`tel:${branch.phone}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.phone}</a>
-                      </li>
-                      <li className="flex items-center gap-2.5">
-                        <Mail className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                        <a href={`mailto:${branch.email}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.email}</a>
-                      </li>
-                    </ul>
-                  </div>
+            <div className="space-y-16 max-w-5xl mx-auto">
+              {branches.map((branch, idx) => {
+                const isEven = idx % 2 === 1;
+                return (
+                  <div 
+                    key={branch.id}
+                    className={`grid lg:grid-cols-12 gap-8 items-center bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm`}
+                  >
+                    {/* Branch details */}
+                    <div className="lg:col-span-5 space-y-5 text-left">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-blue-50 text-brand-primary border border-blue-100">
+                        Office Branch
+                      </span>
+                      <h3 className="text-xl font-bold text-slate-900">{branch.name}</h3>
+                      
+                      <ul className="space-y-3.5 text-sm text-slate-500">
+                        <li className="flex items-start gap-2.5">
+                          <MapPin className="w-5 h-5 text-brand-accent flex-shrink-0 mt-0.5" />
+                          <span>{branch.address}</span>
+                        </li>
+                        <li className="flex items-center gap-2.5">
+                          <Phone className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                          <a href={`tel:${branch.phone}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.phone}</a>
+                        </li>
+                        <li className="flex items-center gap-2.5">
+                          <Mail className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                          <a href={`mailto:${branch.email}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.email}</a>
+                        </li>
+                      </ul>
+                    </div>
 
-                  {/* Responsive Map Iframe */}
-                  <div className="lg:col-span-7 h-80 rounded-2xl overflow-hidden border border-slate-150 relative">
-                    {/* Google Map Iframe Placeholder */}
-                    <iframe
-                      src={branch.mapIframe}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen={true}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`Map showing ${branch.name}`}
-                    />
+                    {/* Responsive Map Iframe */}
+                    <div className="lg:col-span-7 h-80 rounded-2xl overflow-hidden border border-slate-150 relative">
+                      <iframe
+                        src={branch.mapIframe}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`Map showing ${branch.name}`}
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </Container>
-      </Section>
+                );
+              })}
+            </div>
+          </Container>
+        </Section>
+      )}
     </div>
   );
 }
