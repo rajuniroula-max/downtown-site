@@ -102,6 +102,6 @@
     color: var(--foreground);
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
