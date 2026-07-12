@@ -8,7 +8,7 @@ export default async function BranchesListPage() {
 
   return (
     <AdminDataTable
-      title="Branches"
+      title="Office Location"
       data={data || []}
       resourceType="branches"
       tableName="branches"

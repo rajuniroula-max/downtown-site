@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import Image from "next/image";
@@ -15,7 +15,8 @@ import {
   ArrowRight, 
   GraduationCap, 
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Building
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -25,19 +26,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
-// Custom WhatsApp Floating Icon
-function WhatsAppIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      className={className} 
-      viewBox="0 0 24 24" 
-      fill="currentColor"
-    >
-      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.6.95 3.498 1.453 5.418 1.454 5.561 0 10.085-4.526 10.088-10.09.002-2.697-1.045-5.234-2.949-7.14C17.299 1.47 14.773.423 12.01.423 6.446.423 1.924 4.949 1.921 10.516c-.001 1.922.502 3.8 1.457 5.404L2.34 20.354l4.307-1.2zm11.196-7.652c-.3-.15-1.77-.874-2.046-.973-.275-.1-.475-.15-.675.15-.2.3-.775.973-.95 1.173-.175.2-.35.225-.65.075-1.205-.6-2.03-1.054-2.825-2.42-.2-.35-.02-.538.156-.713.16-.16.35-.4.525-.6.175-.2.25-.35.375-.6.125-.25.062-.475-.031-.675-.094-.2-1.046-2.52-1.433-3.454-.378-.908-.763-.785-.95-.795-.175-.008-.375-.01-.575-.01-.2 0-.525.075-.8.375-.275.3-1.05 1.025-1.05 2.5s1.075 2.9 1.225 3.1c.15.2 2.11 3.224 5.116 4.525.715.31 1.273.495 1.71.635.717.228 1.37.196 1.885.118.574-.087 1.77-.724 2.02-1.417.25-.693.25-1.287.175-1.417-.075-.13-.275-.205-.575-.355z" />
-    </svg>
-  );
-}
+
 
 // Custom Social SVGs
 function FacebookIcon({ className }: { className?: string }) {
@@ -58,20 +49,10 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
-function LinkedinIcon({ className }: { className?: string }) {
+function TikTokIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect x="2" y="9" width="4" height="12" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  );
-}
-
-function TwitterIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V9.17a8.16 8.16 0 0 0 4.76 1.51v-3.45c-.86 0-1.69-.2-2.43-.54h-.01l.01-.01H19.6l-.01.01z" />
     </svg>
   );
 }
@@ -104,7 +85,7 @@ const aboutUsItems = [
   { name: "Our Profile & Mission", href: "/about-us" },
   { name: "Meet the Team", href: "/about-us#team" },
   { name: "Testimonials", href: "/reviews" },
-  { name: "Contact Branches", href: "/contact-us" },
+  { name: "Contact Us", href: "/contact-us" },
 ];
 
 export default function SiteLayout({
@@ -114,7 +95,23 @@ export default function SiteLayout({
 }) {
   const [showAnnounce, setShowAnnounce] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<{ facebook?: string; instagram?: string; tiktok?: string }>({});
   const pathname = usePathname();
+
+  useEffect(() => {
+    async function fetchSocials() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("site_settings")
+          .select("value")
+          .eq("key", "social_links")
+          .single();
+        if (data?.value) setSocialLinks(data.value as any);
+      } catch {}
+    }
+    fetchSocials();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased selection:bg-brand-accent/20 selection:text-brand-primary">
@@ -494,18 +491,21 @@ export default function SiteLayout({
                 Empowering students to achieve their global educational dreams. Since our inception, we have guided thousands of learners to premier destinations with absolute integrity and transparency.
               </p>
               <div className="flex items-center gap-3 pt-2">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
-                  <FacebookIcon className="w-4 h-4" />
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
-                  <InstagramIcon className="w-4 h-4" />
-                </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
-                  <LinkedinIcon className="w-4 h-4" />
-                </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
-                  <TwitterIcon className="w-4 h-4" />
-                </a>
+                {socialLinks.facebook && (
+                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
+                    <FacebookIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {socialLinks.instagram && (
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
+                    <InstagramIcon className="w-4 h-4" />
+                  </a>
+                )}
+                {socialLinks.tiktok && (
+                  <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-brand-primary hover:text-white p-2 rounded-lg transition-colors text-slate-400">
+                    <TikTokIcon className="w-4 h-4" />
+                  </a>
+                )}
               </div>
             </div>
 
@@ -517,7 +517,7 @@ export default function SiteLayout({
                 <li><Link href="/blog" className="hover:text-brand-accent transition-colors">Success Blogs & Articles</Link></li>
                 <li><Link href="/about-us" className="hover:text-brand-accent transition-colors">About Our Agency</Link></li>
                 <li><Link href="/about-us#team" className="hover:text-brand-accent transition-colors">Our Advisory Board</Link></li>
-                <li><Link href="/contact-us" className="hover:text-brand-accent transition-colors">Contact Offices</Link></li>
+                <li><Link href="/contact-us" className="hover:text-brand-accent transition-colors">Contact Us</Link></li>
                 <li><Link href="/careers" className="hover:text-brand-accent transition-colors">Careers & Job Openings</Link></li>
               </ul>
             </div>
@@ -536,29 +536,36 @@ export default function SiteLayout({
               </ul>
             </div>
 
-            {/* Column 4: Contact/Branches */}
+            {/* Column 4: Head Office Contact */}
             <div className="space-y-4">
-              <h4 className="text-white font-bold text-sm uppercase tracking-wider">Contact & Branches</h4>
+              <h4 className="text-white font-bold text-sm uppercase tracking-wider">Head Office</h4>
               <ul className="space-y-3.5 text-sm">
                 <li className="flex items-start gap-2.5">
                   <MapPin className="w-5 h-5 text-brand-accent flex-shrink-0 mt-0.5" />
                   <span className="text-slate-400">
-                    <strong className="text-slate-200">Head Office:</strong> Putalisadak, Kathmandu (Opp. Kumari Bank)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="w-5 h-5 text-brand-accent flex-shrink-0 mt-0.5" />
-                  <span className="text-slate-400">
-                    <strong className="text-slate-200">Pokhara Office:</strong> Chipledhunga, Pokhara
+                    Dillibazar-30, Kathmandu 44600
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                  <a href="tel:+977014412345" className="hover:text-brand-accent transition-colors">+977-1-4412345</a>
+                  <div>
+                    <span className="block text-[10px] text-slate-500 font-bold uppercase leading-none">Mobile</span>
+                    <a href="tel:+9779841307624" className="hover:text-brand-accent transition-colors text-slate-300">+977-9841307624</a>
+                  </div>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Building className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                  <div>
+                    <span className="block text-[10px] text-slate-500 font-bold uppercase leading-none">Telephone</span>
+                    <a href="tel:014500099" className="hover:text-brand-accent transition-colors text-slate-300">01-4500099</a>
+                  </div>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                  <a href="mailto:info@downtown.edu.np" className="hover:text-brand-accent transition-colors">info@downtown.edu.np</a>
+                  <div>
+                    <span className="block text-[10px] text-slate-500 font-bold uppercase leading-none">Email</span>
+                    <a href="mailto:info@downtown.edu.np" className="hover:text-brand-accent transition-colors text-slate-300">info@downtown.edu.np</a>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -583,14 +590,20 @@ export default function SiteLayout({
           href="https://wa.me/9779841307624" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="bg-[#25D366] hover:bg-[#128C7E] text-white p-3.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group active:scale-95"
+          className="inline-block transition-all duration-300 hover:scale-105 active:scale-95"
           aria-label="Contact on WhatsApp"
         >
-          <WhatsAppIcon className="w-6 h-6" />
+          <Image 
+            src="/whatsapp.png" 
+            alt="WhatsApp" 
+            width={48} 
+            height={48} 
+            className="w-12 h-12 object-contain rounded-xl shadow-md hover:shadow-lg"
+          />
         </a>
 
         {/* Floating "Get Free Counselling" pill button */}
-        <Link href="/contact?counselling=free">
+        <Link href="/contact-us?counselling=free">
           <button className="bg-brand-accent hover:bg-brand-accent/90 text-white font-extrabold text-sm px-5 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-1px] flex items-center gap-2 active:scale-95">
             <GraduationCap className="w-5 h-5" />
             <span>Get Free Counselling</span>

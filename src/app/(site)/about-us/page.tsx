@@ -144,23 +144,22 @@ export default async function AboutUsPage() {
         <Section bg="muted" className="border-t border-slate-100">
           <Container>
             <SectionHeading 
-              badge="Locations Locator"
-              title="Our Branch Offices"
-              description="Visit our offices physically for a consultation. Directions and maps are details below."
+              badge="Visit Our Office"
+              title="Our Head Office"
+              description="Visit us physically for a free consultation. Directions, hotlines, and map details are below."
             />
 
             <div className="space-y-16 max-w-5xl mx-auto">
-              {branches.map((branch, idx) => {
-                const isEven = idx % 2 === 1;
+              {branches.map((branch) => {
                 return (
                   <div 
                     key={branch.id}
-                    className={`grid lg:grid-cols-12 gap-8 items-center bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm`}
+                    className="grid lg:grid-cols-12 gap-8 items-center bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm"
                   >
                     {/* Branch details */}
                     <div className="lg:col-span-5 space-y-5 text-left">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-blue-50 text-brand-primary border border-blue-100">
-                        Office Branch
+                        Head Office
                       </span>
                       <h3 className="text-xl font-bold text-slate-900">{branch.name}</h3>
                       
@@ -171,11 +170,26 @@ export default async function AboutUsPage() {
                         </li>
                         <li className="flex items-center gap-2.5">
                           <Phone className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                          <a href={`tel:${branch.phone}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.phone}</a>
+                          <div>
+                            <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Mobile</span>
+                            <a href={`tel:${branch.phone}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.phone}</a>
+                          </div>
                         </li>
+                        {branch.telephone && (
+                          <li className="flex items-center gap-2.5">
+                            <Building className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                            <div>
+                              <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Telephone</span>
+                              <a href={`tel:${branch.telephone}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.telephone}</a>
+                            </div>
+                          </li>
+                        )}
                         <li className="flex items-center gap-2.5">
                           <Mail className="w-4 h-4 text-brand-accent flex-shrink-0" />
-                          <a href={`mailto:${branch.email}`} className="hover:text-brand-accent transition-colors font-semibold">{branch.email}</a>
+                          <div>
+                            <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Email</span>
+                            <a href={`mailto:${branch.email}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.email}</a>
+                          </div>
                         </li>
                       </ul>
                     </div>

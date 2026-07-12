@@ -1,6 +1,6 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/server";
-import { SettingsForm } from "@/components/studio/forms/settings-form";
+import { SettingsForm } from "../../../../components/studio/forms/settings-form";
 
 export default async function StudioSettingsPage() {
   const supabase = createClient();
@@ -19,6 +19,13 @@ export default async function StudioSettingsPage() {
     .eq("key", "contact_numbers")
     .single();
 
+  // Fetch social_links setting
+  const { data: socialLinks } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", "social_links")
+    .single();
+
   return (
     <div className="p-6 max-w-3xl space-y-6">
       <div>
@@ -31,6 +38,7 @@ export default async function StudioSettingsPage() {
       <SettingsForm 
         initialAnnouncement={announcementBar?.value || null}
         initialContacts={contactNumbers?.value || null}
+        initialSocials={socialLinks?.value || null}
       />
     </div>
   );

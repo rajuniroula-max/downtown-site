@@ -10,7 +10,8 @@ export function BranchForm({ initialData, id }: Props) {
   const [loading, setLoading] = useState(false); const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: initialData?.name || "", address: initialData?.address || "",
-    phone: initialData?.phone || "", email: initialData?.email || "",
+    phone: initialData?.phone || "", telephone: initialData?.telephone || "",
+    email: initialData?.email || "",
     mapIframe: initialData?.map_iframe || "", orderIndex: initialData?.order_index ?? 0,
   });
   function u(k: string, v: any) { setForm((p) => ({ ...p, [k]: v })); }
@@ -22,12 +23,13 @@ export function BranchForm({ initialData, id }: Props) {
   return (
     <div className="p-6 max-w-3xl bg-slate-50/50 min-h-screen text-slate-850 font-sans">
       <Link href="/studio/branches" className="flex items-center gap-1.5 text-xs text-slate-505 hover:text-slate-900 mb-4 transition-colors"><ArrowLeft className="w-3.5 h-3.5" /> Back</Link>
-      <h1 className="text-xl font-bold text-slate-900 mb-6">{isEdit ? "Edit" : "New"} Branch</h1>
+      <h1 className="text-xl font-bold text-slate-900 mb-6">{isEdit ? "Edit" : "New"} Office Location</h1>
       {error && <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-755 mb-4">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div className="grid grid-cols-2 gap-4">
-          <F label="Name *" value={form.name} onChange={(v) => u("name", v)} />
-          <F label="Phone *" value={form.phone} onChange={(v) => u("phone", v)} />
+          <F label="Office Name *" value={form.name} onChange={(v) => u("name", v)} />
+          <F label="Mobile Phone *" value={form.phone} onChange={(v) => u("phone", v)} placeholder="+977-9841307624" />
+          <F label="Landline Telephone" value={form.telephone} onChange={(v) => u("telephone", v)} placeholder="014500099" />
           <F label="Email *" value={form.email} onChange={(v) => u("email", v)} />
           <F label="Order" value={String(form.orderIndex)} onChange={(v) => u("orderIndex", parseInt(v)||0)} type="number" />
         </div>

@@ -95,6 +95,7 @@ export interface Branch {
   name: string;
   address: string;
   phone: string;
+  telephone?: string;
   email: string;
   mapIframe: string;
 }

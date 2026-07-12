@@ -8,7 +8,12 @@ insert into public.site_settings (key, value) values (
 
 insert into public.site_settings (key, value) values (
   'contact_numbers',
-  '{"kathmandu": "+977-1-4412345", "pokhara": "+977-61-532145", "hotline": "+9779841307624"}'
+  '{"mobile": "+9779841307624", "telephone": "014500099", "email": "info@downtown.edu.np", "whatsapp": "+9779841307624"}'
+) on conflict (key) do update set value = excluded.value;
+
+insert into public.site_settings (key, value) values (
+  'social_links',
+  '{"facebook": "https://www.facebook.com/share/1BH5RJdhKR/?mibextid=wwXIfr", "instagram": "https://www.instagram.com/down_townedu?igsh=MWk2dHVjOThvajZqdQ==", "tiktok": "https://www.tiktok.com/@downtownedu?_r=1&_t=ZS-97weHFVTLgf"}'
 ) on conflict (key) do update set value = excluded.value;
 
 -- 2. Destinations
@@ -133,13 +138,14 @@ insert into public.team_members (
 
 -- 7. Branches
 insert into public.branches (
-  name, address, phone, email, map_iframe, order_index
+  name, address, phone, telephone, email, map_iframe, order_index
 ) values (
-  'Kathmandu Head Office',
-  'Putalisadak, Kathmandu (Opposite Kumari Bank)',
-  '+977-1-4412345',
-  'kathmandu@downtown.edu.np',
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.339247781534!2d85.32049617546686!3d27.706787876185816!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb19a4a75ab1c1%3A0x6335191cf0eb9f9f!2sPutalisadak%2C%20Kathmandu!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp',
+  'Downtown Educational Consultancy — Head Office',
+  'Dillibazar-30, Kathmandu 44600',
+  '+977-9841307624',
+  '014500099',
+  'info@downtown.edu.np',
+  'https://www.google.com/maps?q=27.7054777,85.3258023&z=17&output=embed',
   0
 );
 

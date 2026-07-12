@@ -13,17 +13,25 @@ interface AnnouncementBarValue {
 }
 
 interface ContactNumbersValue {
-  kathmandu: string;
-  pokhara: string;
-  hotline: string;
+  mobile: string;
+  telephone: string;
+  email: string;
+  whatsapp: string;
+}
+
+interface SocialLinksValue {
+  facebook: string;
+  instagram: string;
+  tiktok: string;
 }
 
 interface SettingsFormProps {
   initialAnnouncement: AnnouncementBarValue | null;
   initialContacts: ContactNumbersValue | null;
+  initialSocials: SocialLinksValue | null;
 }
 
-export function SettingsForm({ initialAnnouncement, initialContacts }: SettingsFormProps) {
+export function SettingsForm({ initialAnnouncement, initialContacts, initialSocials }: SettingsFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -38,9 +46,17 @@ export function SettingsForm({ initialAnnouncement, initialContacts }: SettingsF
 
   // Contact Numbers state
   const [contacts, setContacts] = useState<ContactNumbersValue>({
-    kathmandu: initialContacts?.kathmandu || "",
-    pokhara: initialContacts?.pokhara || "",
-    hotline: initialContacts?.hotline || "",
+    mobile: (initialContacts as any)?.mobile || (initialContacts as any)?.hotline || "",
+    telephone: (initialContacts as any)?.telephone || "",
+    email: (initialContacts as any)?.email || "",
+    whatsapp: (initialContacts as any)?.whatsapp || (initialContacts as any)?.hotline || "",
+  });
+
+  // Social Links state
+  const [socials, setSocials] = useState<SocialLinksValue>({
+    facebook: initialSocials?.facebook || "",
+    instagram: initialSocials?.instagram || "",
+    tiktok: initialSocials?.tiktok || "",
   });
 
   async function handleSaveAnnouncement(e: React.FormEvent) {
@@ -65,6 +81,21 @@ export function SettingsForm({ initialAnnouncement, initialContacts }: SettingsF
     try {
       await updateSiteSetting("contact_numbers", contacts);
       setMessage({ type: "success", text: "Contact information settings updated successfully!" });
+      router.refresh();
+    } catch (err: any) {
+      setMessage({ type: "error", text: err.message || "Failed to update settings" });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSaveSocials(e: React.FormEvent) {
+    e.preventDefault();
+    setMessage(null);
+    setLoading(true);
+    try {
+      await updateSiteSetting("social_links", socials);
+      setMessage({ type: "success", text: "Social media links updated successfully!" });
       router.refresh();
     } catch (err: any) {
       setMessage({ type: "error", text: err.message || "Failed to update settings" });
@@ -181,50 +212,64 @@ export function SettingsForm({ initialAnnouncement, initialContacts }: SettingsF
         <div className="border-b border-slate-100 pb-3">
           <h2 className="text-sm font-bold text-slate-900">Contact Information</h2>
           <p className="text-[11px] text-slate-550">
-            Global office contact details and hotlines displayed across site banners.
+            Head office contact details, hotlines, and WhatsApp channels displayed across the website.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Kathmandu Office Phone
+              Mobile Hotline
             </label>
             <input
               type="text"
-              value={contacts.kathmandu}
+              value={contacts.mobile}
               onChange={(e) =>
-                setContacts((prev) => ({ ...prev, kathmandu: e.target.value }))
+                setContacts((prev) => ({ ...prev, mobile: e.target.value }))
               }
-              placeholder="+977-1-4412345"
+              placeholder="+977-9841307624"
               className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Pokhara Office Phone
+              Landline Telephone
             </label>
             <input
               type="text"
-              value={contacts.pokhara}
+              value={contacts.telephone}
               onChange={(e) =>
-                setContacts((prev) => ({ ...prev, pokhara: e.target.value }))
+                setContacts((prev) => ({ ...prev, telephone: e.target.value }))
               }
-              placeholder="+977-61-532145"
+              placeholder="014500099"
               className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Hotline Mobile Number
+              Official Email
             </label>
             <input
               type="text"
-              value={contacts.hotline}
+              value={contacts.email}
               onChange={(e) =>
-                setContacts((prev) => ({ ...prev, hotline: e.target.value }))
+                setContacts((prev) => ({ ...prev, email: e.target.value }))
               }
-              placeholder="+977-98XXXXXXXX"
+              placeholder="info@downtown.edu.np"
+              className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              WhatsApp Link Number
+            </label>
+            <input
+              type="text"
+              value={contacts.whatsapp}
+              onChange={(e) =>
+                setContacts((prev) => ({ ...prev, whatsapp: e.target.value }))
+              }
+              placeholder="+9779841307624"
               className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
             />
           </div>
@@ -238,6 +283,75 @@ export function SettingsForm({ initialAnnouncement, initialContacts }: SettingsF
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             Save Contact Details
+          </button>
+        </div>
+      </form>
+
+      {/* Social Media Links Section */}
+      <form
+        onSubmit={handleSaveSocials}
+        className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm"
+      >
+        <div className="border-b border-slate-100 pb-3">
+          <h2 className="text-sm font-bold text-slate-900">Social Media Links</h2>
+          <p className="text-[11px] text-slate-550">
+            Configure official social profiles links for footer navigation icons.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Facebook Page Link
+            </label>
+            <input
+              type="text"
+              value={socials.facebook}
+              onChange={(e) =>
+                setSocials((prev) => ({ ...prev, facebook: e.target.value }))
+              }
+              placeholder="https://facebook.com/..."
+              className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Instagram Profile Link
+            </label>
+            <input
+              type="text"
+              value={socials.instagram}
+              onChange={(e) =>
+                setSocials((prev) => ({ ...prev, instagram: e.target.value }))
+              }
+              placeholder="https://instagram.com/..."
+              className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              TikTok Profile Link
+            </label>
+            <input
+              type="text"
+              value={socials.tiktok}
+              onChange={(e) =>
+                setSocials((prev) => ({ ...prev, tiktok: e.target.value }))
+              }
+              placeholder="https://tiktok.com/@..."
+              className="w-full h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors"
+            />
+          </div>
+        </div>
+
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="h-8 px-4 rounded-lg bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5 shadow-sm"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            Save Social Links
           </button>
         </div>
       </form>

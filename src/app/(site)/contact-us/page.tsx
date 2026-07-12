@@ -3,23 +3,26 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Loader2
+  Loader2,
+  Building
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
-import { mockBranches } from "@/lib/types/mock-data";
 import { ContactFormClient } from "@/components/site/contact-form-client";
+import { getBranches } from "@/lib/supabase/queries";
 
 export const metadata = {
   title: "Contact Us | Downtown Consultancy",
-  description: "Get in touch with Downtown Consultancy's offices. Fill in our online enquiry form, find local hotline numbers, and view directions to our Kathmandu branches.",
+  description: "Get in touch with Downtown Consultancy's head office. Fill in our online enquiry form, find local hotline numbers, and view directions to our Kathmandu branches.",
   openGraph: {
     title: "Contact Us | Downtown Consultancy",
-    description: "Get in touch with Downtown Consultancy's offices. Fill in our online enquiry form, find local hotline numbers, and view directions to our branches.",
+    description: "Get in touch with Downtown Consultancy's head office. Fill in our online enquiry form, find local hotline numbers, and view directions to our branches.",
     images: [{ url: "/downtown.jpg" }],
   }
 };
 
-export default function ContactUsPage() {
+export default async function ContactUsPage() {
+  const branches = await getBranches();
+
   return (
     <div>
       {/* 1. HERO BANNER */}
@@ -33,10 +36,10 @@ export default function ContactUsPage() {
             Get In Touch
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-            Contact Our Offices
+            Contact Our Head Office
           </h1>
           <p className="text-blue-100 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
-            Have questions about study abroad options or test prep classes? Send us a message or call one of our branches directly.
+            Have questions about study abroad options or test prep classes? Send us a message or call our office directly.
           </p>
         </Container>
       </section>
@@ -73,7 +76,17 @@ export default function ContactUsPage() {
                   </div>
                   <div>
                     <span className="block text-xs text-slate-400 font-bold uppercase">Phone Hotline</span>
-                    <a href="tel:+977014412345" className="font-bold text-slate-800 hover:text-brand-primary transition-colors text-sm">+977-1-4412345</a>
+                    <a href="tel:+9779841307624" className="font-bold text-slate-800 hover:text-brand-primary transition-colors text-sm">+977-9841307624</a>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 text-brand-primary flex items-center justify-center">
+                    <Building className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="block text-xs text-slate-400 font-bold uppercase">Landline Telephone</span>
+                    <a href="tel:014500099" className="font-bold text-slate-800 hover:text-brand-primary transition-colors text-sm">01-4500099</a>
                   </div>
                 </div>
 
@@ -93,52 +106,76 @@ export default function ContactUsPage() {
       </Section>
 
       {/* 3. BRANCH MAPS */}
-      <Section bg="muted" className="border-t border-slate-100">
-        <Container>
-          <SectionHeading 
-            badge="Locations Locator"
-            title="Our Branches Details"
-            description="Directions and details for our branch offices."
-          />
+      {branches.length > 0 && (
+        <Section bg="muted" className="border-t border-slate-100">
+          <Container>
+            <SectionHeading 
+              badge="Office Location"
+              title="Our Head Office Address"
+              description="Directions and details to visit us physically."
+            />
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {mockBranches.map((branch) => (
-              <div 
-                key={branch.id}
-                className="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <h4 className="font-bold text-slate-900 text-base">{branch.name}</h4>
-                  <ul className="space-y-2 text-xs text-slate-500">
-                    <li className="flex items-start gap-1.5">
-                      <MapPin className="w-4 h-4 text-brand-accent flex-shrink-0 mt-0.5" />
-                      <span>{branch.address}</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-brand-accent" />
-                      <span>{branch.phone}</span>
-                    </li>
-                  </ul>
+            <div className="max-w-5xl mx-auto">
+              {branches.map((branch) => (
+                <div 
+                  key={branch.id}
+                  className="bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm grid md:grid-cols-12 gap-8 items-center"
+                >
+                  <div className="md:col-span-5 space-y-4 text-left">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-blue-50 text-brand-primary border border-blue-100">
+                      Head Office
+                    </span>
+                    <h4 className="font-bold text-slate-900 text-lg">{branch.name}</h4>
+                    <ul className="space-y-3.5 text-sm text-slate-500">
+                      <li className="flex items-start gap-2.5">
+                        <MapPin className="w-5 h-5 text-brand-accent flex-shrink-0 mt-0.5" />
+                        <span>{branch.address}</span>
+                      </li>
+                      <li className="flex items-center gap-2.5">
+                        <Phone className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                        <div>
+                          <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Mobile</span>
+                          <a href={`tel:${branch.phone}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.phone}</a>
+                        </div>
+                      </li>
+                      {branch.telephone && (
+                        <li className="flex items-center gap-2.5">
+                          <Building className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                          <div>
+                            <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Telephone</span>
+                            <a href={`tel:${branch.telephone}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.telephone}</a>
+                          </div>
+                        </li>
+                      )}
+                      <li className="flex items-center gap-2.5">
+                        <Mail className="w-4 h-4 text-brand-accent flex-shrink-0" />
+                        <div>
+                          <span className="block text-[10px] text-slate-400 font-bold uppercase leading-none">Email</span>
+                          <a href={`mailto:${branch.email}`} className="hover:text-brand-accent transition-colors font-semibold text-slate-700">{branch.email}</a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  {/* Embedded map */}
+                  <div className="md:col-span-7 h-72 rounded-2xl overflow-hidden border border-slate-150 relative">
+                    <iframe
+                      src={branch.mapIframe}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen={true}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Google Map pointing to ${branch.name}`}
+                    />
+                  </div>
                 </div>
-                
-                {/* Embedded map */}
-                <div className="h-56 mt-6 rounded-xl overflow-hidden border border-slate-100">
-                  <iframe
-                    src={branch.mapIframe}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen={true}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Google Map pointing to ${branch.name}`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
     </div>
   );
 }

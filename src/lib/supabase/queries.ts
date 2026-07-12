@@ -271,6 +271,7 @@ export async function getBranches(): Promise<Branch[]> {
       name: b.name,
       address: b.address,
       phone: b.phone,
+      telephone: b.telephone || "",
       email: b.email,
       mapIframe: b.map_iframe
     }));

@@ -161,6 +161,7 @@ export async function upsertBranch(id: string | null, data: any) {
     name: data.name,
     address: data.address,
     phone: data.phone,
+    telephone: data.telephone,
     email: data.email,
     map_iframe: data.mapIframe,
     order_index: data.orderIndex ?? 0,
