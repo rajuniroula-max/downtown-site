@@ -7,7 +7,7 @@ import {
   GraduationCap
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
-import { getTeamMembers, getBranches } from "@/lib/supabase/queries";
+import { getTeamMembers, getBranches, getContactInfo } from "@/lib/supabase/queries";
 
 export const metadata = {
   title: "About Us | Downtown Consultancy",
@@ -32,7 +32,18 @@ function getInitials(name: string) {
 
 export default async function AboutUsPage() {
   const teamMembers = await getTeamMembers();
-  const branches = await getBranches();
+  const branchesData = await getBranches();
+  const contactInfo = await getContactInfo();
+
+  const branches = branchesData.length > 0 ? branchesData : [{
+    id: "head-office",
+    name: "Downtown Educational Consultancy — Head Office",
+    address: contactInfo?.address || "Dillibazar-30, Kathmandu 44600",
+    phone: contactInfo?.mobile || contactInfo?.hotline || "+977-9841307624",
+    telephone: contactInfo?.telephone || "014500099",
+    email: contactInfo?.email || "info@downtown.edu.np",
+    mapIframe: contactInfo?.map_iframe || "https://maps.google.com/maps?q=27.7054777,85.3258023&z=17&output=embed"
+  }];
 
   return (
     <div>

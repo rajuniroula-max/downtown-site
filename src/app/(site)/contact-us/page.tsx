@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Container, Section, SectionHeading } from "@/components/site/layout-components";
 import { ContactFormClient } from "@/components/site/contact-form-client";
-import { getBranches } from "@/lib/supabase/queries";
+import { getBranches, getContactInfo } from "@/lib/supabase/queries";
 
 export const metadata = {
   title: "Contact Us | Downtown Consultancy",
@@ -21,7 +21,18 @@ export const metadata = {
 };
 
 export default async function ContactUsPage() {
-  const branches = await getBranches();
+  const branchesData = await getBranches();
+  const contactInfo = await getContactInfo();
+
+  const branches = branchesData.length > 0 ? branchesData : [{
+    id: "head-office",
+    name: "Downtown Educational Consultancy — Head Office",
+    address: contactInfo?.address || "Dillibazar-30, Kathmandu 44600",
+    phone: contactInfo?.mobile || contactInfo?.hotline || "+977-9841307624",
+    telephone: contactInfo?.telephone || "014500099",
+    email: contactInfo?.email || "info@downtown.edu.np",
+    mapIframe: contactInfo?.map_iframe || "https://maps.google.com/maps?q=27.7054777,85.3258023&z=17&output=embed"
+  }];
 
   return (
     <div>

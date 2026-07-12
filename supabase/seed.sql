@@ -8,7 +8,7 @@ insert into public.site_settings (key, value) values (
 
 insert into public.site_settings (key, value) values (
   'contact_numbers',
-  '{"mobile": "+9779841307624", "telephone": "014500099", "email": "info@downtown.edu.np", "whatsapp": "+9779841307624"}'
+  '{"mobile": "+9779841307624", "telephone": "014500099", "email": "info@downtown.edu.np", "whatsapp": "+9779841307624", "address": "Dillibazar-30, Kathmandu 44600", "map_iframe": "https://maps.google.com/maps?q=27.7054777,85.3258023&z=17&output=embed"}'
 ) on conflict (key) do update set value = excluded.value;
 
 insert into public.site_settings (key, value) values (

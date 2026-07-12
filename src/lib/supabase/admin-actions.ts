@@ -175,6 +175,7 @@ export async function upsertBranch(id: string | null, data: any) {
     if (error) throw new Error(error.message);
   }
   revalidatePath("/studio/branches");
+  revalidatePath("/about-us");
   revalidatePath("/contact-us");
 }
 

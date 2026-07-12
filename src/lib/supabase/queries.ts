@@ -361,3 +361,17 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     return null;
   }
 }
+
+export async function getContactInfo() {
+  const supabase = createClient();
+  try {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "contact_numbers")
+      .single();
+    return data?.value || null;
+  } catch (e) {
+    return null;
+  }
+}
