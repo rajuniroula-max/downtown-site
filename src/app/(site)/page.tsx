@@ -244,36 +244,52 @@ export default async function Home() {
             {studyDestinations.map((dest) => (
               <div 
                 key={dest.slug}
-                className="group relative bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col justify-between overflow-hidden"
+                className="group relative bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col justify-between overflow-hidden"
               >
-                <div className="space-y-4">
-                  {/* Flag and Badge */}
-                  <div className="flex justify-between items-center">
-                    <span className="text-4xl" role="img" aria-label={dest.country}>
-                      {dest.flagIcon}
-                    </span>
-                    <span className="text-[10px] font-bold text-brand-primary bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                {/* Thumbnail image header */}
+                <div className="h-48 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+                  {dest.heroImage ? (
+                    <img 
+                      src={dest.heroImage} 
+                      alt={dest.heroImageAlt || `Study in ${dest.country}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-350 bg-slate-200">
+                      <Globe className="w-8 h-8 text-slate-400" />
+                    </div>
+                  )}
+                  {/* Badge on top of image */}
+                  {dest.badge && (
+                    <span className="absolute top-3.5 right-3.5 text-[9px] font-bold text-white bg-brand-primary/95 border border-brand-primary/10 px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm z-10">
                       {dest.badge}
                     </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-brand-primary transition-colors">
-                      Study in {dest.country}
-                    </h3>
-                    <p className="text-slate-500 text-sm leading-relaxed line-clamp-3">
-                      {dest.tagline}
-                    </p>
+                  )}
+                  {/* Flag emoji or code inside overlay */}
+                  <div className="absolute bottom-3.5 left-3.5 w-9 h-9 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-xl font-bold text-slate-800 shadow-sm z-10">
+                    {dest.flagIcon}
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between text-xs font-bold text-slate-400">
-                  <span className="text-slate-400 font-semibold">{dest.universitiesCount} Partner Universities</span>
-                  <Link href={`/study-abroad/${dest.slug}`}>
-                    <span className="text-brand-primary group-hover:text-brand-accent transition-colors flex items-center gap-1 cursor-pointer">
-                      Explore Guide <ChevronRight className="w-4 h-4" />
-                    </span>
-                  </Link>
+                {/* Content body wrapper */}
+                <div className="p-5 flex-grow flex flex-col justify-between gap-4">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-primary transition-colors">
+                      Study in {dest.country}
+                    </h3>
+                    <p className="text-slate-500 text-xs leading-relaxed line-clamp-3">
+                      {dest.tagline}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-400">
+                    <span className="text-slate-400 font-semibold">{dest.universitiesCount} Partner Universities</span>
+                    <Link href={`/study-abroad/${dest.slug}`}>
+                      <span className="text-brand-primary group-hover:text-brand-accent transition-colors flex items-center gap-0.5 cursor-pointer">
+                        Explore Guide <ChevronRight className="w-4 h-4" />
+                      </span>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

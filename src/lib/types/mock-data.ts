@@ -11,6 +11,7 @@ export interface Destination {
   badge: string;
   tagline: string;
   heroImage: string;
+  heroImageAlt?: string;
   whyStudyText: string;
   whyStudyPoints: string[];
   costOfLiving: {

@@ -110,8 +110,16 @@ export default function UniversitiesListClient({ initialUniversities }: ClientPr
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-brand-primary text-white flex items-center justify-center font-extrabold text-sm shadow-sm">
-                        {uni.logo}
+                      <div className="w-12 h-12 rounded-xl bg-brand-primary text-white flex items-center justify-center font-extrabold text-[10px] shadow-sm overflow-hidden relative">
+                        {uni.logo && (uni.logo.startsWith("http://") || uni.logo.startsWith("https://") || uni.logo.startsWith("/")) ? (
+                          <img 
+                            src={uni.logo} 
+                            alt={uni.name} 
+                            className="w-full h-full object-contain p-1.5 bg-white"
+                          />
+                        ) : (
+                          <span>{uni.logo}</span>
+                        )}
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900 group-hover:text-brand-primary transition-colors text-base line-clamp-1">

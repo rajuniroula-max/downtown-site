@@ -101,8 +101,16 @@ export default async function UniversityDetailPage({ params }: UniversityDetailP
           </Link>
           
           <div className="flex flex-col md:flex-row md:items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-brand-accent flex items-center justify-center font-black text-xl shadow-lg">
-              {university.logo}
+            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-brand-accent flex items-center justify-center font-black text-sm shadow-lg overflow-hidden relative">
+              {university.logo && (university.logo.startsWith("http://") || university.logo.startsWith("https://") || university.logo.startsWith("/")) ? (
+                <img 
+                  src={university.logo} 
+                  alt={university.name} 
+                  className="w-full h-full object-contain p-2 bg-white"
+                />
+              ) : (
+                <span>{university.logo}</span>
+              )}
             </div>
             <div className="space-y-2">
               <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
@@ -189,9 +197,19 @@ export default async function UniversityDetailPage({ params }: UniversityDetailP
                     {university.galleryImages.map((img, idx) => (
                       <div 
                         key={idx}
-                        className="h-28 bg-slate-100 rounded-xl border border-slate-200/50 flex items-center justify-center text-slate-400 font-bold text-xs"
+                        className="h-28 bg-slate-100 rounded-xl border border-slate-200/50 overflow-hidden relative"
                       >
-                        Campus Preview
+                        {img && (img.startsWith("http://") || img.startsWith("https://") || img.startsWith("/")) ? (
+                          <img 
+                            src={img} 
+                            alt={`${university.name} Campus Preview ${idx + 1}`} 
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-[10px] text-center p-2">
+                            Campus Preview
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -117,7 +117,14 @@ export default async function StudyAbroadCountryPage({ params }: DestinationPage
       />
       {/* 1. HERO BANNER */}
       <section className="relative bg-brand-primary text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-slate-950/40 z-10" />
+        {destination.heroImage && (
+          <img 
+            src={destination.heroImage} 
+            alt={destination.heroImageAlt || `Study in ${destination.country}`}
+            className="absolute inset-0 w-full h-full object-cover object-center opacity-35 z-0 select-none pointer-events-none"
+          />
+        )}
+        <div className="absolute inset-0 bg-slate-950/50 z-10" />
         <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-brand-accent/20 blur-3xl z-0" />
         <div className="absolute left-1/10 bottom-1/10 w-96 h-96 rounded-full bg-blue-900/40 blur-3xl z-0" />
 
@@ -266,8 +273,16 @@ export default async function StudyAbroadCountryPage({ params }: DestinationPage
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-lg bg-brand-primary text-white flex items-center justify-center font-bold text-xs">
-                        {uni.logo}
+                      <div className="w-10 h-10 rounded-lg bg-brand-primary text-white flex items-center justify-center font-bold text-[9px] overflow-hidden relative">
+                        {uni.logo && (uni.logo.startsWith("http://") || uni.logo.startsWith("https://") || uni.logo.startsWith("/")) ? (
+                          <img 
+                            src={uni.logo} 
+                            alt={uni.name} 
+                            className="w-full h-full object-contain p-1 bg-white"
+                          />
+                        ) : (
+                          <span>{uni.logo}</span>
+                        )}
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 group-hover:text-brand-primary transition-colors text-base">{uni.name}</h4>

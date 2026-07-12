@@ -21,6 +21,15 @@ const companyMilestones = [
   { year: "2024", title: "5000+ Enrolled Students", desc: "Successfully milestone reached of placing international students across global university campuses." }
 ];
 
+function getInitials(name: string) {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
 export default async function AboutUsPage() {
   const teamMembers = await getTeamMembers();
   const branches = await getBranches();
@@ -122,8 +131,16 @@ export default async function AboutUsPage() {
                   key={member.id}
                   className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm p-6 text-center space-y-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="w-16 h-16 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center font-black text-lg mx-auto border border-blue-100">
-                    {member.image}
+                  <div className="w-16 h-16 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center font-black text-lg mx-auto border border-blue-100 overflow-hidden relative">
+                    {member.image && (member.image.startsWith("http://") || member.image.startsWith("https://") || member.image.startsWith("/")) ? (
+                      <img 
+                        src={member.image} 
+                        alt={member.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span>{member.image || getInitials(member.name)}</span>
+                    )}
                   </div>
                   <div className="space-y-1">
                     <h4 className="font-bold text-slate-900 text-base">{member.name}</h4>
