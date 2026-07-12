@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, Calendar, Clock, Filter, CheckCircle2, AlertCircle, RefreshCw, Send } from "lucide-react";
-import { updateInquiryStatus } from "@/lib/supabase/admin-actions";
+import { Mail, Phone, Calendar, Clock, Filter, CheckCircle2, AlertCircle, RefreshCw, Send, Trash2 } from "lucide-react";
+import { updateInquiryStatus, deleteInquiry } from "@/lib/supabase/admin-actions";
 import { replyToInquiry } from "@/app/actions/inquiry";
 
 interface Inquiry {
@@ -30,6 +30,14 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Inquiries local state to allow fast UI updates without full page reload
+  const [inquiries, setInquiries] = useState<Inquiry[]>(initialInquiries);
+
+  // Sync state when props change
+  useEffect(() => {
+    setInquiries(initialInquiries);
+  }, [initialInquiries]);
+
   // States for custom reply editor
   const [replyingId, setReplyingId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -37,7 +45,11 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
   const [replyError, setReplyError] = useState<string | null>(null);
   const [replySuccessMessage, setReplySuccessMessage] = useState<string | null>(null);
 
-  const filteredInquiries = initialInquiries.filter((inq) => {
+  // States for delete action
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const filteredInquiries = inquiries.filter((inq) => {
     if (filterStatus === "all") return true;
     return inq.status === filterStatus;
   });
@@ -47,6 +59,9 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
     startTransition(async () => {
       try {
         await updateInquiryStatus(id, newStatus);
+        setInquiries((prev) =>
+          prev.map((inq) => (inq.id === id ? { ...inq, status: newStatus } : inq))
+        );
         router.refresh();
       } catch (err) {
         console.error("Failed to update inquiry status:", err);
@@ -65,6 +80,17 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
       const res = await replyToInquiry(id, recipientEmail, replyText);
       if (res.success) {
         setReplySuccessMessage("Email response sent successfully and logged in database.");
+        setInquiries((prev) =>
+          prev.map((inq) =>
+            inq.id === id
+              ? {
+                  ...inq,
+                  replied_at: new Date().toISOString(),
+                  reply_message: replyText,
+                }
+              : inq
+          )
+        );
         setReplyText("");
         setReplyingId(null);
         router.refresh();
@@ -74,6 +100,21 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
       setReplyError(err.message || "Failed to send email. Please try again.");
     } finally {
       setReplySendingId(null);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    try {
+      await deleteInquiry(id);
+      setInquiries((prev) => prev.filter((inq) => inq.id !== id));
+      setDeleteConfirmId(null);
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to delete inquiry:", err);
+      alert("Failed to delete inquiry. Please try again.");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -282,26 +323,69 @@ export function InquiriesListClient({ initialInquiries }: InquiriesListClientPro
                   </div>
                 </div>
 
-                {/* Send Reply Button trigger */}
-                {replyingId !== inq.id && (
+                <div className="flex items-center gap-2 ml-auto">
+                  {/* Send Reply Button trigger */}
+                  {replyingId !== inq.id && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyingId(inq.id);
+                        setReplyText("");
+                        setReplyError(null);
+                      }}
+                      className="h-8 px-4 rounded-lg bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary hover:text-brand-primary/90 text-xs font-bold border border-brand-primary/30 shadow-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      {inq.replied_at ? "Write Another Reply" : "Reply via Email"}
+                    </button>
+                  )}
+
+                  {/* Delete Button */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setReplyingId(inq.id);
-                      setReplyText("");
-                      setReplyError(null);
-                    }}
-                    className="h-8 px-4 rounded-lg bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary hover:text-brand-primary/90 text-xs font-bold border border-brand-primary/30 shadow-sm transition-colors flex items-center gap-1.5"
+                    onClick={() => setDeleteConfirmId(inq.id)}
+                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-red-650 hover:bg-red-50 border border-slate-200 hover:border-red-200 shadow-sm flex items-center justify-center transition-all"
+                    title="Delete Inquiry"
                   >
-                    <Mail className="w-3.5 h-3.5" />
-                    {inq.replied_at ? "Write Another Reply" : "Reply via Email"}
+                    <Trash2 className="w-4 h-4" />
                   </button>
-                )}
+                </div>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 shadow-xl rounded-xl p-6 w-full max-w-sm mx-4 transform animate-in zoom-in-95 duration-200">
+            <h3 className="text-sm font-bold text-slate-900 mb-2">Confirm Delete</h3>
+            <p className="text-xs text-slate-600 mb-5">
+              Are you sure you want to delete this inquiry? This action cannot be undone.
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="h-8 px-3 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                disabled={deletingId === deleteConfirmId}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmId)}
+                disabled={deletingId === deleteConfirmId}
+                className="h-8 px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {deletingId === deleteConfirmId && (
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                )}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

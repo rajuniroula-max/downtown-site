@@ -66,23 +66,25 @@ export default function BlogListClient({ initialPosts }: ClientProps) {
         <Container>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             {/* Category Tabs */}
-            <div className="flex flex-wrap gap-1.5 bg-slate-100 p-1.5 rounded-2xl">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setCurrentPage(1); // reset to page 1
-                  }}
-                  className={`px-4.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-colors ${
-                    selectedCategory === cat
-                      ? "bg-brand-primary text-white shadow-sm"
-                      : "text-slate-500 hover:text-slate-950"
-                  }`}
-                >
-                  {tabName(cat)}
-                </button>
-              ))}
+            <div className="w-full md:w-auto overflow-x-auto pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="flex gap-2 min-w-max md:min-w-0 md:flex-wrap bg-slate-100 p-1.5 rounded-2xl">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setCurrentPage(1); // reset to page 1
+                    }}
+                    className={`px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 ${
+                      selectedCategory === cat
+                        ? "bg-brand-primary text-white shadow-sm"
+                        : "bg-white text-slate-650 hover:bg-slate-200/50 hover:text-slate-900 border border-slate-200/60 shadow-sm"
+                    }`}
+                  >
+                    {tabName(cat)}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Input Search Box */}

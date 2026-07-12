@@ -237,6 +237,15 @@ export async function updateInquiryStatus(id: string, status: string) {
   revalidatePath("/studio");
 }
 
+// ── Inquiries delete ──
+export async function deleteInquiry(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("inquiries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/studio/inquiries");
+  revalidatePath("/studio");
+}
+
 // ── Site Settings ──
 export async function updateSiteSetting(key: string, value: any) {
   const supabase = createClient();
